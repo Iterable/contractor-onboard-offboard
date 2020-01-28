@@ -4,10 +4,10 @@ import json
 import os
 
 import requests
-from dotenv import load_dotenv
-load_dotenv()
+from dotenv import load_dotenv  #Comment this line on prod
+load_dotenv()   #Comment this line on prod
 
-from Okta import Okta
+from okta import Okta
 
 ENV = os.environ['ENV']
 GROUP_ID = os.environ['GROUP_ID']

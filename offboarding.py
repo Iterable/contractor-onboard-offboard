@@ -4,11 +4,11 @@ import json
 import os
 
 import requests
-from dotenv import load_dotenv
+from dotenv import load_dotenv  #Comment this line on prod
 
-from Okta import Okta
+from okta import Okta
 
-load_dotenv()
+load_dotenv()   #Comment this line on prod
 
 OKTA_URL = os.environ['OKTA_URL']
 OKTA_API_KEY = os.environ['OKTA_API_KEY']
