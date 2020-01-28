@@ -1,6 +1,3 @@
-import json
-import os
-
 import requests
 
 class Okta:
@@ -16,14 +13,21 @@ class Okta:
         }
 
     def get_user_by_login(self, login):
+        """Retrieves user from the api using the login
 
+        Arguments:
+            login {str} -- Login_email
+
+        Returns:
+            str -- okta_id
+        """
         url = self.OKTA_URL + f"/api/v1/users?q={login}"
         response = requests.get(url, headers=self.headers)
         data = response.json()
         try:
             return data[0]['id']
-        except IndexError as e:
-            print("Error:", e, "\nLogin_id not found in Okta.")
+        except IndexError as exception:
+            print("Error:", exception, "\nLogin_id not found in Okta.")
 
     def deactivate_user(self, okta_id):
         """Deactivate user from OKTA
@@ -39,7 +43,7 @@ class Okta:
         response = requests.post(url, headers=self.headers)
         return response.status_code
 
-    def create_user(self, firstname, lastname, login_id, secondary_email, ext = None):
+    def create_user(self, firstname, lastname, login_id, secondary_email, ext=None):
         """Creates the OKTA user
 
         Arguments:
@@ -108,4 +112,20 @@ class Okta:
         url = self.OKTA_URL + f"/api/v1/users/{user_id}/lifecycle/activate?sendEmail={send_email}"
 
         response = requests.post(url, headers=self.headers)
+        return response.status_code
+
+    def add_profile(self, user_id, **kwargs):
+        """Add data to the profile of the user
+
+        Arguments:
+            user_id {str} -- Okta user_id of the user to be updated
+
+        Returns:
+            int -- status code
+        """
+        profile_data = {'profile':{}}
+        for key, value in kwargs.items():
+            profile_data['profile'][key] = value
+        url = self.OKTA_URL + f"/api/v1/users/${user_id}"
+        response = requests.post(url, json=profile_data, headers=self.headers)
         return response.status_code
