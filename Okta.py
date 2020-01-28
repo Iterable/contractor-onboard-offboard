@@ -48,6 +48,9 @@ class Okta:
             login_id {str} -- Login ID, must be unique
             secondary_email {str} -- Email to send initial login information
 
+        Keyword Arguments:
+            ext {str} -- Add optional description (default: {None})
+
         Returns:
             tuple -- returns OKTA id, the user full profile ID, and the status code
         """
