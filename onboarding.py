@@ -34,7 +34,7 @@ def lambda_handler(event, context):
 
     okta = Okta(OKTA_URL,OKTA_API_KEY)
     okta_id, okta_login_id, status = okta.create_user(firstname, lastname, login_id,
-                                                      secondary_email)
+                                                      secondary_email, ext=None)
     if status == 400:
         print("Login ID already exists in the the system. Try again with \
             a different login_id.")

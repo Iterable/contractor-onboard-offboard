@@ -39,7 +39,7 @@ class Okta:
         response = requests.post(url, headers=self.headers)
         return response.status_code
 
-    def create_user(self, firstname, lastname, login_id, secondary_email):
+    def create_user(self, firstname, lastname, login_id, secondary_email, ext = None):
         """Creates the OKTA user
 
         Arguments:
@@ -51,14 +51,17 @@ class Okta:
         Returns:
             tuple -- returns OKTA id, the user full profile ID, and the status code
         """
-
+        if ext is not None:
+            email = f"{login_id}.{ext}@iterable.com"
+        else:
+            email = f"{login_id}@iterable.com"
         url = self.OKTA_URL + "/api/v1/users?activate=false"
         profile_json = {
             'profile': {
                 'firstName': firstname,
                 'lastName': lastname,
-                'email': f'{login_id}@iterable.com',
-                'login': f'{login_id}@iterable.com',
+                'email': email,
+                'login': email,
                 'secondEmail': secondary_email
             }
         }
