@@ -4,8 +4,9 @@ import json
 import os
 
 import requests
-from dotenv import load_dotenv  #Comment this line on prod
+from dotenv import load_dotenv  # Comment this line on prod
 
+from jira import Jira
 from okta import Okta
 
 load_dotenv()   #Comment this line on prod
@@ -13,6 +14,9 @@ load_dotenv()   #Comment this line on prod
 OKTA_URL = os.environ['OKTA_URL']
 OKTA_API_KEY = os.environ['OKTA_API_KEY']
 ENV = os.environ['ENV']
+JIRA_USER = os.environ['JIRA_USER']
+JIRA_AUTH = os.environ['JIRA_AUTH']
+JIRA_URL = os.environ['JIRA_URL']
 
 
 def lambda_handler(event, context):
@@ -31,7 +35,16 @@ def lambda_handler(event, context):
 
     okta_id = okta.get_user_by_login(login_id)
     if okta_id != None:
-        status = okta.deactivate_user(okta_id)
+        if ENV == "PROD":
+            jira = Jira(JIRA_USER, JIRA_AUTH, JIRA_URL)
+
+            okta_logs = okta.get_logs(okta_id)
+            summary = f"{login_id} has been deactivated from OKTA"
+            body = f"{login_id} has been deactivated from OKTA and their okta log has been attached to this ticket."
+
+            jira.create_issue_with_attachment(summary, body, okta_logs, "okta_logs.json")
+            status = okta.deactivate_user(okta_id)
+
         print("Deactivation successful!")
         return {
             "status": status
