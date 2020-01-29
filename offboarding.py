@@ -3,7 +3,6 @@
 import json
 import os
 
-import requests
 from dotenv import load_dotenv  # Comment this line on prod
 
 from jira import Jira
@@ -34,13 +33,14 @@ def lambda_handler(event, context):
     okta = Okta(OKTA_URL, OKTA_API_KEY)
 
     okta_id = okta.get_user_by_login(login_id)
-    if okta_id != None:
+    if okta_id is not None:
         if ENV == "PROD":
             jira = Jira(JIRA_USER, JIRA_AUTH, JIRA_URL)
 
-            okta_logs = okta.get_logs(okta_id)
+            okta_logs, _ = okta.get_logs(okta_id)   # returns the log text and status code; using _
             summary = f"{login_id} has been deactivated from OKTA"
-            body = f"{login_id} has been deactivated from OKTA and their okta log has been attached to this ticket."
+            body = f"{login_id} has been deactivated from OKTA and their okta log " + \
+            "has been attached to this ticket."
 
             jira.create_issue_with_attachment(summary, body, okta_logs, "okta_logs.json")
             status = okta.deactivate_user(okta_id)

@@ -143,4 +143,4 @@ class Okta:
 
     def get_logs(self, okta_id):
         response = requests.get('https://iterable.okta.com/api/v1/logs?filter=target.id+eq+"{0}"+or+actor.id+eq+"{0}"'.format(okta_id), headers=self.headers)
-        return response.status_code, response.text
+        return response.text, response.status_code

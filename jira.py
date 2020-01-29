@@ -1,14 +1,20 @@
 """Jira Module to create issure and issue to attachment
 
 """
-
-import os
-
 import requests
 from requests.auth import HTTPBasicAuth
 
 class Jira:
+    """Jira Class
+    """
     def __init__(self, user, auth, url):
+        """To Jira username, user authentication pass and the jira url.
+        
+        Arguments:
+            user {str} -- Jira email
+            auth {str} -- Jira password
+            url {str} -- Root domain of the company; e.g. https://xyz.abc.com
+        """
         self.user = user
         self.auth = auth
         self.url = url
@@ -61,7 +67,7 @@ class Jira:
         }
         try:
             response = requests.post(url, auth=HTTPBasicAuth(self.user, self.auth),
-                                    headers=jira_headers, json=jira_ticket)
+                                     headers=jira_headers, json=jira_ticket)
             return response.json()['key']
         except KeyError as error:
             print("Key not found: ", error)
@@ -85,12 +91,12 @@ class Jira:
         jira_file = {"file" : (filename, str(text))}
         jira_header = {"X-Atlassian-Token": "no-check"}
         response = requests.post(url, auth=HTTPBasicAuth(self.user, self.auth), files=jira_file,
-                                headers=jira_header)
+                                 headers=jira_header)
         return response.status_code
 
 
     def create_issue_with_attachment(self, summary, body, text, filename, key_value="ITTIX",
-                                    issue_type="10002"):
+                                     issue_type="10002"):
         """Creates and issue with attachment (attaches the log onto the jira ticket)
 
         Arguments:
