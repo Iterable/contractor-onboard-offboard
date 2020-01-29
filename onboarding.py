@@ -45,6 +45,9 @@ def lambda_handler(event, context):
                     Try again with a different login_id."
             })
         }
+
+    okta.add_profile(okta_id, userType="Contractor")
+
     status = okta.add_user_to_group(okta_id, GROUP_ID)
     if status != 204:
         print("User created in OKTA but error adding the user to XYZ \

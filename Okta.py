@@ -1,3 +1,10 @@
+"""
+Okta Module
+
+written in python 3.8
+"""
+import json
+
 import requests
 
 class Okta:
@@ -5,7 +12,7 @@ class Okta:
 
     """
     def __init__(self, okta_url, okta_api_key):
-        self.OKTA_URL = okta_url
+        self.okta_url = okta_url
         self.headers = {
             'Content-Type': 'application/json',
             'Accept': 'application/json',
@@ -21,7 +28,7 @@ class Okta:
         Returns:
             str -- okta_id
         """
-        url = self.OKTA_URL + f"/api/v1/users?q={login}"
+        url = self.okta_url + f"/api/v1/users?q={login}"
         response = requests.get(url, headers=self.headers)
         data = response.json()
         try:
@@ -38,7 +45,7 @@ class Okta:
         Returns:
             int -- status code
         """
-        url = self.OKTA_URL + f"/api/v1/users/{okta_id}/lifecycle/deactivate"
+        url = self.okta_url + f"/api/v1/users/{okta_id}/lifecycle/deactivate"
 
         response = requests.post(url, headers=self.headers)
         return response.status_code
@@ -62,7 +69,7 @@ class Okta:
             email = f"{login_id}.{ext}@iterable.com"
         else:
             email = f"{login_id}@iterable.com"
-        url = self.OKTA_URL + "/api/v1/users?activate=false"
+        url = self.okta_url + "/api/v1/users?activate=false"
         profile_json = {
             'profile': {
                 'firstName': firstname,
@@ -89,7 +96,7 @@ class Okta:
         Returns:
             int -- status code
         """
-        url = self.OKTA_URL + f"/api/v1/groups/{group_id}/users/{user_id}"
+        url = self.okta_url + f"/api/v1/groups/{group_id}/users/{user_id}"
         response = requests.put(url, headers=self.headers)
         return response.status_code
 
@@ -109,7 +116,7 @@ class Okta:
             send_email = "true"
         else:
             send_email = "false"
-        url = self.OKTA_URL + f"/api/v1/users/{user_id}/lifecycle/activate?sendEmail={send_email}"
+        url = self.okta_url + f"/api/v1/users/{user_id}/lifecycle/activate?sendEmail={send_email}"
 
         response = requests.post(url, headers=self.headers)
         return response.status_code
@@ -123,9 +130,13 @@ class Okta:
         Returns:
             int -- status code
         """
+        url = self.okta_url + f"/api/v1/users/{user_id}"
+
         profile_data = {'profile':{}}
         for key, value in kwargs.items():
             profile_data['profile'][key] = value
-        url = self.OKTA_URL + f"/api/v1/users/${user_id}"
-        response = requests.post(url, json=profile_data, headers=self.headers)
+
+        response = requests.post(url, headers=self.headers, json=profile_data)
+        if response.status_code == 400:
+            print(response.json()["errorCauses"][0]["errorSummary"])
         return response.status_code
