@@ -140,3 +140,7 @@ class Okta:
         if response.status_code == 400:
             print(response.json()["errorCauses"][0]["errorSummary"])
         return response.status_code
+
+    def get_logs(self, okta_id):
+        response = requests.get('https://iterable.okta.com/api/v1/logs?filter=target.id+eq+"{0}"+or+actor.id+eq+"{0}"'.format(okta_id), headers=self.headers)
+        return response.status_code, response.text
