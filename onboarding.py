@@ -5,10 +5,12 @@ import os
 
 from dotenv import load_dotenv  # Comment this line on prod
 
+# Custom Module
 from okta import Okta
 
 load_dotenv()   #Comment this line on prod
 
+# Environment Variables
 ENV = os.environ['ENV']
 GROUP_ID = os.environ['GROUP_ID']
 OKTA_URL = os.environ['OKTA_URL']
@@ -36,13 +38,13 @@ def lambda_handler(event, context):
     okta_id, okta_login_id, status = okta.create_user(firstname, lastname, login_id,
                                                       secondary_email, ext="ext")
     if status == 400:
-        print("Login ID already exists in the the system. Try again with \
-            a different login_id.")
+        print("Login ID already exists in the the system. Try again with " + \
+            "a different login_id.")
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "Login ID already exists in the the system. \
-                    Try again with a different login_id."
+                "message": "Login ID already exists in the the system. " + \
+                    "Try again with a different login_id."
             })
         }
 
@@ -50,33 +52,33 @@ def lambda_handler(event, context):
 
     status = okta.add_user_to_group(okta_id, GROUP_ID)
     if status != 204:
-        print("User created in OKTA but error adding the user to XYZ \
-            group. Exiting!")
+        print("User created in OKTA but error adding the user to XYZ " + \
+            "group. Exiting!")
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "User created in OKTA but error adding the \
-                    user to XYZ group. Exiting!"
+                "message": "User created in OKTA but error adding the " + \
+                    "user to XYZ group. Exiting!"
             })
         }
     status = okta.activate_user(okta_id)
     if status != 200:
-        print("User created in Okta and added to group but was unable to \
-            be activated. Exiting!")
+        print("User created in Okta and added to group but was unable to " + \
+            "be activated. Exiting!")
         return {
             "statusCode": 400,
             "body": json.dumps({
-                "message": "User created in Okta and added to group but \
-                    was unable to be activated. Exiting!"
+                "message": "User created in Okta and added to group but " + \
+                    "was unable to be activated. Exiting!"
             })
         }
-    print(f"Success! user {firstname} {lastname} with login {okta_login_id} \
-                has been created and activated successfully!")
+    print(f"Success! user {firstname} {lastname} with login {okta_login_id} " + \
+                "has been created and activated successfully!")
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": f"Success! user {firstname} {lastname} with login {okta_login_id} \
-                has been created and activated successfully!"
+            "message": f"Success! user {firstname} {lastname} with login {okta_login_id} " + \
+                "has been created and activated successfully!"
         })
     }
 
