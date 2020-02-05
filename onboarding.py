@@ -22,21 +22,18 @@ def lambda_handler(event, context):
     Returns:
         dict -- dictionary status code and message code
     """
-    if ENV == 'PROD':
-        evnts = json.loads(event['body'])
-        firstname = evnts['first_name']
-        lastname = evnts['last_name']
-        login_id = evnts['login_id']
-        secondary_email = evnts['secondary_email']
-    else:
-        firstname = "Jane1"
-        lastname = "Doe1"
-        login_id = "final.test"
-        secondary_email = "shahisunny.47@gmail.com"
+
+    login_id = event['login_id']
+    profile = {
+        'firstName': event['first_name'],
+        'lastName': event['last_name'],
+        'secondEmail': event['secondary_email'],
+        'manager': event['manager_name']
+    }
 
     okta = Okta(OKTA_URL, OKTA_API_KEY)
-    okta_id, okta_login_id, status = okta.create_user(firstname, lastname, login_id,
-                                                      secondary_email, ext="ext")
+    okta_id, okta_login_id, status = okta.create_user_by_profile(profile, login_id, 'ext')
+
     if status == 400:
         print("Login ID already exists in the the system. Try again with " + \
             "a different login_id.")
@@ -72,15 +69,34 @@ def lambda_handler(event, context):
                     "was unable to be activated. Exiting!"
             })
         }
-    print(f"Success! user {firstname} {lastname} with login {okta_login_id} " + \
+    print(f"Success! user {event['first_name']} {event['last_name']} with login {okta_login_id} " + \
                 "has been created and activated successfully!")
     return {
         "statusCode": 200,
         "body": json.dumps({
-            "message": f"Success! user {firstname} {lastname} with login {okta_login_id} " + \
+            "message": f"Success! user {event['first_name']} {event['last_name']} with login {okta_login_id} " + \
                 "has been created and activated successfully!"
         })
     }
 
+def main(events, context):
+    if ENV == 'prod':
+        evnts = {}
+        event_body = json.loads(events['body'])
+        evnts['first_name'] = event_body['fields']['customfield_11130']
+        evnts['last_name'] = event_body['fields']['customfield_11131']
+        evnts['secondary_email'] = event_body['fields']['customfield_11080']
+        evnts['manager_name'] = event_body['fields']['customfield_11044']['displayName']
+        evnts['login_id'] = event_body['fields']['customfield_11128']
+    else:
+        evnts = {}
+        evnts['first_name'] = "Test1"
+        evnts['last_name'] = "test2"
+        evnts['secondary_email'] = "test.test@gmail.com"
+        evnts['manager_name'] = "tester tester"
+        evnts['login_id'] = "test1.test2124"
+
+    lambda_handler(evnts, {})
+
 if __name__ == "__main__":
-    lambda_handler({}, {})
+    main({}, {})
