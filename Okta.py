@@ -36,6 +36,19 @@ class Okta:
         except IndexError as exception:
             print("Error:", exception, "\nLogin_id not found in Okta.")
 
+    def suspend_user(self, okta_id):
+        """Suspend Okta User
+
+        Arguments:
+            okta_id {str} -- Okta Unique ID
+
+        Returns:
+            int -- status code from the HTTP operation
+        """
+        url = self.okta_url + f"/api/v1/users/{okta_id}/lifecycle/suspend"
+        response = requests.post(url, headers=self.headers)
+        return response.status_code
+
     def deactivate_user(self, okta_id):
         """Deactivate user from OKTA
 
