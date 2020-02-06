@@ -144,3 +144,41 @@ class Okta:
     def get_logs(self, okta_id):
         response = requests.get('https://iterable.okta.com/api/v1/logs?filter=target.id+eq+"{0}"+or+actor.id+eq+"{0}"'.format(okta_id), headers=self.headers)
         return response.text, response.status_code
+
+    def create_user_by_profile(self, profile, login_id, ext=None):
+        """Creates the OKTA user
+
+        Arguments:
+            firstname {str} -- First Name
+            lastname {str} -- Last Name
+            login_id {str} -- Login ID, must be unique
+            secondary_email {str} -- Email to send initial login information
+
+        Keyword Arguments:
+            ext {str} -- Add optional description (default: {None})
+
+        Returns:
+            tuple -- returns OKTA id, the user full profile ID, and the status code
+        """
+        if ext is not None:
+            email = f"{login_id}.{ext}@iterable.com"
+        else:
+            email = f"{login_id}@iterable.com"
+        url = self.okta_url + "/api/v1/users?activate=false"
+        profile_json = {
+            'profile': {
+                'email': email,
+                'login': email
+            }
+        }
+
+        for key, value in profile.items():
+            profile_json['profile'][key] = value
+        print(profile_json)
+
+        response = requests.post(url, headers=self.headers, json=profile_json)
+        if response.status_code == 200:
+            response_data = response.json()
+            return response_data['id'], response_data['profile']['login'], response.status_code
+
+        return None, None, response.status_code
